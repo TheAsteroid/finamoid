@@ -1,0 +1,2 @@
+# finamoid
+Finance Manager
