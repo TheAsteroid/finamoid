@@ -1,0 +1,67 @@
+*           text=auto
+*.cs        diff=csharp
+*.css       diff=css
+*.htm       diff=html
+*.html      diff=html
+
+*.sln       eol=crlf
+*.csproj    eol=crlf
+*.vbproj    eol=crlf
+*.vcxproj   eol=crlf
+*.vcproj    eol=crlf
+*.dbproj    eol=crlf
+*.fsproj    eol=crlf
+*.lsproj    eol=crlf
+*.wixproj   eol=crlf
+*.modelproj eol=crlf
+*.sqlproj   eol=crlf
+*.wwaproj   eol=crlf
+*.targets   eol=crlf
+*.props     eol=crlf
+
+*.bat       eol=crlf
+*.cdxml     eol=crlf
+*.cs        eol=crlf
+*.css       eol=lf
+*.htm       eol=lf
+*.html      eol=lf
+*.js        eol=lf
+*.jsx       eol=lf
+*.less      eol=lf
+*.ps1       eol=crlf
+*.ps1xml    eol=crlf
+*.psc1      eol=crlf
+*.psd1      eol=crlf
+*.psm1      eol=crlf
+*.pssc      eol=crlf
+*.sh        eol=lf
+*.ts        eol=lf
+
+###############################################################################
+# Set default behavior for binary files.
+###############################################################################
+*.ac3       binary
+*.asf       binary
+*.avi       binary
+*.bmp       binary
+*.chm       binary
+*.dll       binary
+*.gif       binary
+*.ico       binary
+*.jpe       binary
+*.jpeg      binary
+*.jpg       binary
+*.m1v       binary
+*.m4a       binary
+*.mp3       binary
+*.mp4       binary
+*.ogg       binary
+*.otf       binary
+*.png       binary
+*.ttf       binary
+*.wav       binary
+*.webp      binary
+*.woff      binary
+*.woff2     binary
+*.pdf       binary
+*.dat       binary
