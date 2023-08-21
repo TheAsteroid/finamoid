@@ -1,55 +1,57 @@
-﻿using Finamoid.Abstractions.Encryption;
+﻿using Finamoid.Storage;
 using Finamoid.Utils;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Finamoid.Encryption
 {
-    public class KeyProvider : IKeyProvider
+    internal class KeyProvider : IKeyProvider
     {
-        private readonly IEncryptionConfiguration _encryptionConfiguration;
         private readonly IPasswordProvider _passwordProvider;
         private readonly IEncryptor _encryptor;
-
-        private const string _recoveryKeyDirectory = "r";
-        private const string _defaultKeyFileName = "d";
+        private readonly string _recoveryKeyDirectory;
+        private readonly string _defaultKeyPath;
 
         public KeyProvider(
-            IEncryptionConfiguration encryptionConfiguration,
+            IOptions<StorageOptions> storageOptions,
             IPasswordProvider passwordProvider,
             IEncryptor encryptor)
         {
-            _encryptionConfiguration = encryptionConfiguration;
+            var keyDirectory = Path.Combine(
+                storageOptions.Value.RootDirectory ?? throw new ArgumentException($"{nameof(storageOptions.Value.RootDirectory)} cannot be null."),
+                "k");
+
+            _recoveryKeyDirectory = Path.Combine(keyDirectory, "r");
+            _defaultKeyPath = Path.Combine(keyDirectory, $"d{Constants.DataFileExtension}");
+
             _passwordProvider = passwordProvider;
             _encryptor = encryptor;
         }
 
         public async Task<byte[]> GetSymmetricKeyAsync()
         {
-            var passwordKeyBytes = Encoding.UTF8.GetBytes(_passwordProvider.GetPassword());
+            var passwordKey = _passwordProvider.GetPasswordKey();
 
-            var keyDirectory = _encryptionConfiguration.EncryptionKeyDirectory;
-
-            var defaultKeyFile = Path.Combine(keyDirectory, $"{_defaultKeyFileName}{Constants.DataFileExtension}");
-
-            var bytes = await File.ReadAllBytesAsync(defaultKeyFile);
+            var bytes = await File.ReadAllBytesAsync(_defaultKeyPath);
 
             byte[]? key = null;
             try
             {
-                key = _encryptor.Decrypt(passwordKeyBytes, bytes);
+                key = _encryptor.Decrypt(passwordKey, bytes);
             }
             catch (CryptographicException)
             {
                 // If decryption with password fails, perhaps a recovery key is provided.
                 // In this case attempt to decrypt the keys in the recovery directory
-                var alternateKeyDirectory = Path.Combine(keyDirectory, _recoveryKeyDirectory);
-                foreach (var keyFile in Directory.GetFiles(alternateKeyDirectory, $"*{Constants.DataFileExtension}"))
+                foreach (var keyFile in Directory.EnumerateFiles(
+                    _recoveryKeyDirectory,
+                    $"*{Constants.DataFileExtension}",
+                    SearchOption.AllDirectories))
                 {
-                    bytes = await File.ReadAllBytesAsync(defaultKeyFile);
+                    bytes = await File.ReadAllBytesAsync(keyFile);
                     try
                     {
-                        key = _encryptor.Decrypt(passwordKeyBytes, bytes);
+                        key = _encryptor.Decrypt(passwordKey, bytes);
                     }
                     catch (CryptographicException) { }
                 }

@@ -1,6 +1,4 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.Aggregation;
-using Finamoid.Abstractions.Categorization;
+﻿using Finamoid.Categorization;
 using Finamoid.Utils;
 
 namespace Finamoid.Aggregation

@@ -1,7 +1,7 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     public interface ICategoryWriter
     {
-        Task WriteAsync(string path, IEnumerable<Category> categories);
+        Task WriteAsync(IEnumerable<Category> categories);
     }
 }

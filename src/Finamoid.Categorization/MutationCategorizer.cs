@@ -1,22 +1,48 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.Categorization;
+﻿using Finamoid.Mutations;
 
 namespace Finamoid.Categorization
 {
     public class MutationCategorizer : IMutationCategorizer
     {
-        public IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations)
+        public IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations, bool ignoreDuplicateCategories)
         {
             var result = new List<CategorizedMutation>();
 
             var inCategories = categories.Where(c => c.BalanceType == BalanceType.In);
             var outCategories = categories.Where(c => c.BalanceType == BalanceType.Out);
 
+            var inWildcardCategory = inCategories.Where(i => i.IsWildcard).FirstOrDefault();
+            var outWildcardCategory = outCategories.Where(i => i.IsWildcard).FirstOrDefault();
+
+            if (inWildcardCategory == null)
+            {
+                throw new InvalidDataException($"No wildcard category found in provided categories for {nameof(BalanceType)} {BalanceType.In}.");
+            }
+
+            if (outWildcardCategory == null)
+            {
+                throw new InvalidDataException($"No wildcard category found in provided categories for {nameof(BalanceType)} {BalanceType.Out}.");
+            }
+
             foreach (var mutation in mutations)
             {
+                var balanceType = mutation.Amount.Amount > 0 ? BalanceType.In : BalanceType.Out;
                 var mutationCategories =
-                    (mutation.Amount.Amount > 0 ? inCategories : outCategories)
+                    (balanceType == BalanceType.In ? inCategories : outCategories)
                     .Where(c => c.Filters.Any(c => IsMatch(c, mutation)));
+
+                if (!mutationCategories.Any())
+                {
+                    mutationCategories = new[] 
+                    {
+                        balanceType == BalanceType.In ? inWildcardCategory : outWildcardCategory
+                    };
+                }
+
+                if (ignoreDuplicateCategories)
+                {
+                    mutationCategories = mutationCategories.Take(1);
+                }
 
                 result.Add(new CategorizedMutation(mutationCategories.Select(c => c.Code), mutation));
             }
@@ -35,7 +61,7 @@ namespace Finamoid.Categorization
                     $"Assign the mutation to a category with balance type {expectedBalanceType}.");
             }
 
-            if (!category.Filters.Any(c => IsMatch(c, categorizedMutation)))
+            if (!category.IsWildcard && !category.Filters.Any(c => IsMatch(c, categorizedMutation)))
             {
                 throw new InvalidOperationException(
                     $"Mutation does not match category {category.Code}." +

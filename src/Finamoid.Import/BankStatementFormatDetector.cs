@@ -1,10 +1,9 @@
-﻿using Finamoid.Abstractions.Import;
-using IbanNet;
+﻿using IbanNet;
 using System.Globalization;
 
 namespace Finamoid.Import
 {
-    public class BankStatementFormatDetector : IBankStatementFormatDetector
+    internal class BankStatementFormatDetector : IBankStatementFormatDetector
     {
         private readonly IIbanParser _ibanParser;
 
@@ -53,7 +52,7 @@ namespace Finamoid.Import
             }
 
             return
-                DateTime.TryParseExact(columns[0], "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _) &&
+                DateTime.TryParseExact(columns[0], "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out _) &&
                 _ibanParser.TryParse(columns[1], out _);
         }
 

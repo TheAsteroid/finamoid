@@ -1,12 +1,9 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization.CategorizedMutations
 {
     public interface ICategorizedMutationReader
     {
-        Task<IEnumerable<CategorizedMutation>> ReadFromDirectoryAsync(
-            string directory,
-            DateTime? startDate = null,
-            DateTime? endDate = null);
+        Task<IEnumerable<CategorizedMutation>> ReadAsync(DateTime? startDate = null, DateTime? endDate = null);
 
-        Task<IEnumerable<CategorizedMutation>> ReadFromFileAsync(string directory);
+        Task<IEnumerable<CategorizedMutation>> ReadAsync(string relativePath);
     }
 }

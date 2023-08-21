@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions
+﻿namespace Finamoid
 {
     public enum PeriodType
     {

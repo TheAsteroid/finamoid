@@ -1,9 +1,10 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     public record Category(
         string Code,
         string Name,
-        string MainCategory,
+        string? MainCategory,
         BalanceType BalanceType,
+        bool IsWildcard,
         IEnumerable<CategoryFilter> Filters);
 }
