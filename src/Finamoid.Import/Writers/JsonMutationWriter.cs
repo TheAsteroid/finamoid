@@ -1,25 +1,23 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.FileHandling;
-using Finamoid.Abstractions.Import;
-using Finamoid.Import.Readers;
+﻿using Finamoid.Import.Readers;
+using Finamoid.Storage;
 using Finamoid.Utils;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace Finamoid.Import.Writers
 {
-    public class JsonMutationWriter : IMutationWriter
+    internal class JsonMutationWriter : IMutationWriter
     {
-        private readonly IFileWriter _fileWriter;
+        private readonly IStorageHandlerFactory _storageHandlerFactory;
         private readonly IJsonMutationReader _jsonMutationReader;
 
-        public JsonMutationWriter(IFileWriter fileWriter, IJsonMutationReader jsonMutationReader)
+        public JsonMutationWriter(IStorageHandlerFactory storageHandlerFactory, IJsonMutationReader jsonMutationReader)
         {
-            _fileWriter = fileWriter;
+            _storageHandlerFactory = storageHandlerFactory;
             _jsonMutationReader = jsonMutationReader;
         }
 
-        public async Task WriteAsync(string directory, IEnumerable<Mutation> mutations, PeriodType periodType)
+        public async Task WriteAsync(IEnumerable<Mutation> mutations, PeriodType periodType)
         {
             var mutationsPerFile = new ConcurrentDictionary<string, List<Mutation>>();
 
@@ -37,20 +35,21 @@ namespace Finamoid.Import.Writers
                     });
             }
 
+            var storageHandler = _storageHandlerFactory.Get(StorageType.Mutations);
             foreach (var file in mutationsPerFile)
             {
-                var fileName = Path.Combine(directory, $"{file.Key}{Constants.DataFileExtension}");
+                var fileName = $"{file.Key}{Constants.DataFileExtension}";
 
                 var mutationsToWrite = file.Value;
-                if (File.Exists(fileName))
+                if (storageHandler.FileExists(fileName))
                 {
-                    mutationsToWrite.AddRange(await _jsonMutationReader.ReadFromFileAsync(fileName));
+                    mutationsToWrite.AddRange(await _jsonMutationReader.ReadAsync(fileName));
                 }
 
                 // Filter out duplicate entries
                 mutationsToWrite = mutationsToWrite.DistinctBy(m => m.Id).ToList();
 
-                await _fileWriter.WriteAsync(
+                await storageHandler.WriteAsync(
                     fileName,
                     JsonConvert.SerializeObject(mutationsToWrite, Constants.IndentJson ? Formatting.Indented : Formatting.None));
             }

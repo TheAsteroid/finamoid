@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     public record Category(
         string Code,

@@ -2,15 +2,26 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Finamoid.Import;
+using Microsoft.Extensions.Configuration;
+using Finamoid.Storage;
+using Finamoid.Encryption;
 
-var builder = Host.CreateDefaultBuilder();
+var builder = Host.CreateApplicationBuilder();
 
-builder.ConfigureServices(s =>
-{
-    s.AddHostedService<CliService>();
-});
+//builder.Configuration
+//    .AddJsonFile("appsettings.json", optional: true)
+//    .AddEnvironmentVariables()
+//    .Build();
 
-builder.ConfigureLogging(l => l.SetMinimumLevel(LogLevel.Warning));
+builder.Services
+    .AddHostedService<CliService>()
+    .AddMutationImport()
+    .AddEncryption()
+    .AddStorage()
+    .Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+
+builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
 using var host = builder.Build();
 

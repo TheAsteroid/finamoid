@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions.Encryption
+﻿namespace Finamoid.Encryption
 {
     public interface IKeyProvider
     {

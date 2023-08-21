@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Finamoid.Abstractions\Finamoid.Abstractions.csproj" />
     <ProjectReference Include="..\Finamoid.Utils\Finamoid.Utils.csproj" />
   </ItemGroup>

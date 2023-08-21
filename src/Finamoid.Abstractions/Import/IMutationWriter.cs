@@ -1,7 +1,7 @@
-﻿namespace Finamoid.Abstractions.Import
+﻿namespace Finamoid.Import
 {
     public interface IMutationWriter
     {
-        Task WriteAsync(string directory, IEnumerable<Mutation> mutations, PeriodType periodType);
+        Task WriteAsync(IEnumerable<Mutation> mutations, PeriodType periodType);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Finamoid.Abstractions.Aggregation;
-using Finamoid.Abstractions.FileHandling;
+﻿using Finamoid.Storage;
 using Finamoid.Utils;
 using Newtonsoft.Json;
 
@@ -7,18 +6,18 @@ namespace Finamoid.Aggregation
 {
     public class CategoryAggregationWriter : ICategoryAggregationWriter
     {
-        private readonly IFileWriter _fileWriter;
+        private readonly IStorageHandler _storageHandler;
         private readonly ICategoryAggregationReader _categoryAggregationReader;
 
-        public CategoryAggregationWriter(IFileWriter fileWriter, ICategoryAggregationReader categoryAggregationReader)
+        public CategoryAggregationWriter(IStorageHandlerFactory storageHandlerFactory, ICategoryAggregationReader categoryAggregationReader)
         {
-            _fileWriter = fileWriter;
+            _storageHandler = storageHandlerFactory.Get(StorageType.Aggregations);
             _categoryAggregationReader = categoryAggregationReader;
         }
 
         public async Task WriteAsync(string path, IEnumerable<CategoryAggregation> categoryAggregations)
         {
-            if (File.Exists(path))
+            if (_storageHandler.FileExists(path))
             {
                 // Merge existing aggregations into new aggregations.
                 var categoryCodesToWrite = new HashSet<string>(categoryAggregations.Select(c => c.CategoryCode));
@@ -33,7 +32,7 @@ namespace Finamoid.Aggregation
                 categoryAggregations = aggregationsToWrite;
             }
 
-            await _fileWriter.WriteAsync(
+            await _storageHandler.WriteAsync(
                 path, 
                 JsonConvert.SerializeObject(
                     categoryAggregations, 

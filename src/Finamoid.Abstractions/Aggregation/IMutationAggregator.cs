@@ -1,6 +1,6 @@
-﻿using Finamoid.Abstractions.Categorization;
+﻿using Finamoid.Categorization;
 
-namespace Finamoid.Abstractions.Aggregation
+namespace Finamoid.Aggregation
 {
     public interface IMutationAggregator
     {

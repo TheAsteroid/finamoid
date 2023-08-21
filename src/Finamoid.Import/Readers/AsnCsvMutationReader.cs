@@ -1,6 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using Finamoid.Abstractions;
+using Finamoid;
 using System.Globalization;
 
 namespace Finamoid.Import.Readers
@@ -9,7 +9,7 @@ namespace Finamoid.Import.Readers
     /// Reader for the ASN Bank CSV format
     /// Format specification: https://www.asnbank.nl/web/file?uuid=fc28db9c-d91e-4a2c-bd3a-30cffb057e8b&owner=6916ad14-918d-4ea8-80ac-f71f0ff1928e&contentid=852
     /// </summary>
-    public class AsnCsvMutationReader : MutationReader
+    internal class AsnCsvMutationReader : RawMutationReader
     {
         private static readonly Dictionary<string, Currency> _currencyMap = new()
         {
@@ -74,7 +74,7 @@ namespace Finamoid.Import.Readers
 
         private const string _dateTimeFormat = "dd-MM-yyyy";
 
-        public override async Task<IEnumerable<Mutation>> ReadFromFileAsync(string path)
+        public override async Task<IEnumerable<Mutation>> ReadAsync(string path)
         {
             var result = new List<Mutation>();
             using var streamReader = new StreamReader(path);
@@ -104,7 +104,7 @@ namespace Finamoid.Import.Readers
             while (await csvReader.ReadAsync())
             {
                 row++;
-                if (csvReader.ColumnCount == 0)
+                if (csvReader.Parser.Count == 0)
                 {
                     continue;
                 }
@@ -122,10 +122,12 @@ namespace Finamoid.Import.Readers
 
                 // TODO https://github.com/TheAsteroid/finamoid/issues/4: Set row as context, add to logging instead.
                 var context = $"File: {path}. Row: {row}. ";
-                if (!DateTime.TryParseExact(dateTimeString, _dateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
+                if (!DateTime.TryParseExact(dateTimeString, _dateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dateTime))
                 {
                     throw new InvalidDataException($"{context}Could not parse date '{dateTimeString}' at index 0 with format {_dateTimeFormat}.");
                 }
+
+                dateTime = dateTime.ToUniversalTime();
 
                 if (mutationCurrencyString == null || !_currencyMap.TryGetValue(mutationCurrencyString, out var mutationCurrency))
                 {

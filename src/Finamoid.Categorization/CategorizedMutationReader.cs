@@ -1,5 +1,4 @@
-﻿using Finamoid.Abstractions.Categorization;
-using Finamoid.Abstractions.FileHandling;
+﻿using Finamoid.Storage;
 using Finamoid.Utils;
 using Newtonsoft.Json;
 
@@ -7,30 +6,29 @@ namespace Finamoid.Categorization
 {
     public class CategorizedMutationReader : ICategorizedMutationReader
     {
-        private readonly IFileReader _fileReader;
+        private readonly IStorageHandler _storageHandler;
 
-        public CategorizedMutationReader(IFileReader fileReader)
+        public CategorizedMutationReader(IStorageHandlerFactory storageHandlerFactory)
         {
-            _fileReader = fileReader;
+            _storageHandler = storageHandlerFactory.Get(StorageType.CategorizedMutations);
         }
 
-        public async Task<IEnumerable<CategorizedMutation>> ReadFromDirectoryAsync(
-            string directory,
+        public async Task<IEnumerable<CategorizedMutation>> ReadAsync(
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
             var result = new List<CategorizedMutation>();
 
             // Get files that fall in the required range
-            var matchedFiles = Directory.EnumerateFiles(
-                directory,
-                "*",
+            var matchedFiles = _storageHandler.EnumerateFiles(
+                string.Empty,
+                $"*{Constants.DataFileExtension}",
                 SearchOption.AllDirectories)
                 .Where(f => FileHelper.FileNameIsInPeriod(f, startDate, endDate));
 
             foreach (var fileName in matchedFiles)
             {
-                result.AddRange(await ReadFromFileAsync(fileName));
+                result.AddRange(await ReadAsync(fileName));
             }
 
             // Some mutations in the matched files might still fall outside the required range, filter these out
@@ -39,9 +37,9 @@ namespace Finamoid.Categorization
                 (endDate == null || c.DateTime.Date <= endDate.Value.Date));
         }
 
-        public async Task<IEnumerable<CategorizedMutation>> ReadFromFileAsync(string path)
+        public async Task<IEnumerable<CategorizedMutation>> ReadAsync(string relativePath)
         {
-            var data = await _fileReader.ReadAsync(path);
+            var data = await _storageHandler.ReadAllTextAsync(relativePath);
 
             return
                 JsonConvert.DeserializeObject<IEnumerable<CategorizedMutation>>(data) ??

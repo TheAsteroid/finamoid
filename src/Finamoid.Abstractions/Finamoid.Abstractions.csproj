@@ -1,2 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Finamoid</RootNamespace>
+  </PropertyGroup>
 </Project>

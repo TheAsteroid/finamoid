@@ -1,7 +1,7 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     public interface ICategoryReader
     {
-        Task<IEnumerable<Category>> ReadAsync(string path);
+        Task<IEnumerable<Category>> ReadAsync(string relativePath);
     }
 }

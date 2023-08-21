@@ -1,9 +1,6 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.Import;
-
-namespace Finamoid.Import.Readers
+﻿namespace Finamoid.Import.Readers
 {
-    public abstract class MutationReader : IMutationReader
+    public abstract class RawMutationReader : IRawMutationReader
     {
         public async Task<IEnumerable<Mutation>> ReadFromDirectoryAsync(string directory)
         {
@@ -11,12 +8,12 @@ namespace Finamoid.Import.Readers
 
             foreach (var path in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
             {
-                result.AddRange(await ReadFromFileAsync(path));
+                result.AddRange(await ReadAsync(path));
             }
 
             return result;
         }
 
-        public abstract Task<IEnumerable<Mutation>> ReadFromFileAsync(string path);
+        public abstract Task<IEnumerable<Mutation>> ReadAsync(string path);
     }
 }

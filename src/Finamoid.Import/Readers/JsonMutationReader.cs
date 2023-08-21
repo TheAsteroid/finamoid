@@ -1,21 +1,20 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.FileHandling;
+﻿using Finamoid.Storage;
 using Newtonsoft.Json;
 
 namespace Finamoid.Import.Readers
 {
-    public class JsonMutationReader : MutationReader, IJsonMutationReader
+    internal class JsonMutationReader : IJsonMutationReader
     {
-        private readonly IFileReader _fileReader;
+        private readonly IStorageHandler _storageHandler;
 
-        public JsonMutationReader(IFileReader fileReader)
+        public JsonMutationReader(IStorageHandlerFactory storageHandlerFactory)
         {
-            _fileReader = fileReader;
+            _storageHandler = storageHandlerFactory.Get(StorageType.Mutations);
         }
 
-        public override async Task<IEnumerable<Mutation>> ReadFromFileAsync(string path)
+        public async Task<IEnumerable<Mutation>> ReadAsync(string relativePath)
         {
-            var data = await _fileReader.ReadAsync(path);
+            var data = await _storageHandler.ReadAllTextAsync(relativePath);
 
             return JsonConvert.DeserializeObject<IEnumerable<Mutation>>(data) ?? Enumerable.Empty<Mutation>();
         }

@@ -1,7 +1,7 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     public interface ICategorizedMutationWriter
     {
-        Task WriteAsync(string directory, IEnumerable<CategorizedMutation> categorizedMutations, PeriodType periodType);
+        Task WriteAsync(IEnumerable<CategorizedMutation> categorizedMutations, PeriodType periodType);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Finamoid.Abstractions;
+﻿using Finamoid;
 
 namespace Finamoid.Utils
 {

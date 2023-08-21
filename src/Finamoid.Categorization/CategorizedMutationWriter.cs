@@ -1,6 +1,4 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.Categorization;
-using Finamoid.Abstractions.FileHandling;
+﻿using Finamoid.Storage;
 using Finamoid.Utils;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
@@ -9,16 +7,18 @@ namespace Finamoid.Categorization
 {
     public class CategorizedMutationWriter : ICategorizedMutationWriter
     {
-        private readonly IFileWriter _fileWriter;
+        private readonly IStorageHandler _storageHandler;
         private readonly ICategorizedMutationReader _categorizedMutationReader;
 
-        public CategorizedMutationWriter(IFileWriter fileWriter, ICategorizedMutationReader categorizedMutationReader)
+        public CategorizedMutationWriter(
+            IStorageHandlerFactory storageHandlerFactory,
+            ICategorizedMutationReader categorizedMutationReader)
         {
-            _fileWriter = fileWriter;
+            _storageHandler = storageHandlerFactory.Get(StorageType.CategorizedMutations);
             _categorizedMutationReader = categorizedMutationReader;
         }
 
-        public async Task WriteAsync(string directory, IEnumerable<CategorizedMutation> categorizedMutations, PeriodType periodType)
+        public async Task WriteAsync(IEnumerable<CategorizedMutation> categorizedMutations, PeriodType periodType)
         {
             var mutationsPerFile = new ConcurrentDictionary<string, List<CategorizedMutation>>();
 
@@ -38,19 +38,19 @@ namespace Finamoid.Categorization
 
             foreach (var file in mutationsPerFile)
             {
-                var fileName = Path.Combine(directory, $"{file.Key}{Constants.DataFileExtension}");
+                var fileName = $"{file.Key}{Constants.DataFileExtension}";
 
                 var mutationsToWrite = file.Value;
-                if (File.Exists(fileName))
+                if (_storageHandler.FileExists(fileName))
                 {
-                    var existingMutations = await _categorizedMutationReader.ReadFromFileAsync(fileName);
+                    var existingMutations = await _categorizedMutationReader.ReadAsync(fileName);
 
                     // Overwrite existing mutations with new mutations,
                     // but make sure to keep existing mutations that are not in the new mutations.
                     mutationsToWrite.AddRange(existingMutations.Where(e => !mutationsToWrite.Any(m => m.Id == e.Id)));
                 }
 
-                await _fileWriter.WriteAsync(
+                await _storageHandler.WriteAsync(
                     fileName,
                     JsonConvert.SerializeObject(mutationsToWrite, Constants.IndentJson ? Formatting.Indented : Formatting.None));
             }

@@ -1,5 +1,5 @@
-﻿using Finamoid.Abstractions;
-using Finamoid.Abstractions.Categorization;
+﻿using Finamoid;
+using Finamoid.Categorization;
 
 namespace Finamoid.Categorization
 {

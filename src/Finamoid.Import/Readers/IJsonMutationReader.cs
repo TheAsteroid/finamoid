@@ -1,8 +1,7 @@
-﻿using Finamoid.Abstractions.Import;
-
-namespace Finamoid.Import.Readers
+﻿namespace Finamoid.Import.Readers
 {
-    public interface IJsonMutationReader : IMutationReader
+    internal interface IJsonMutationReader
     {
+        Task<IEnumerable<Mutation>> ReadAsync(string relativePath);
     }
 }

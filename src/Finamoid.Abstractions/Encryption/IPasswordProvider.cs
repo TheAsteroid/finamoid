@@ -1,7 +1,9 @@
-﻿namespace Finamoid.Abstractions.Encryption
+﻿namespace Finamoid.Encryption
 {
     public interface IPasswordProvider
     {
-        string GetPassword();
+        byte[] GetPasswordKey();
+
+        void SetPassword(string password, byte[] salt);
     }
 }

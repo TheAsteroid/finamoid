@@ -13,6 +13,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Finamoid.Abstractions\Finamoid.Abstractions.csproj" />
+    <ProjectReference Include="..\Finamoid.Encryption\Finamoid.Encryption.csproj" />
+    <ProjectReference Include="..\Finamoid.Import\Finamoid.Import.csproj" />
+    <ProjectReference Include="..\Finamoid.Storage\Finamoid.Storage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

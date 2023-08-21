@@ -1,9 +1,9 @@
-﻿using Finamoid.Abstractions.Encryption;
+﻿using Finamoid.Encryption;
 using System.Security.Cryptography;
 
 namespace Finamoid.Encryption
 {
-    public class SymmetricEncryptor : IEncryptor
+    internal class SymmetricEncryptor : IEncryptor
     {
         private const int _ivLength = 16;
 

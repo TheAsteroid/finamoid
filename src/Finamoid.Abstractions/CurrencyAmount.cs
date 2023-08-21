@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions
+﻿namespace Finamoid
 {
     public record CurrencyAmount(decimal Amount, Currency Currency);
 }

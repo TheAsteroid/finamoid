@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions.Aggregation
+﻿namespace Finamoid.Aggregation
 {
     public interface ICategoryAggregationWriter
     {

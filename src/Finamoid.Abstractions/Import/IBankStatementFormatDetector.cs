@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions.Import
+﻿namespace Finamoid.Import
 {
     public interface IBankStatementFormatDetector
     {

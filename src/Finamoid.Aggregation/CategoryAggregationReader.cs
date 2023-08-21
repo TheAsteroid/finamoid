@@ -1,24 +1,23 @@
-﻿using Finamoid.Abstractions.Aggregation;
-using Finamoid.Abstractions.FileHandling;
+﻿using Finamoid.Storage;
 using Newtonsoft.Json;
 
 namespace Finamoid.Aggregation
 {
     public class CategoryAggregationReader : ICategoryAggregationReader
     {
-        private readonly IFileReader _fileReader;
+        private readonly IStorageHandler _storageHandler;
 
-        public CategoryAggregationReader(IFileReader fileReader)
+        public CategoryAggregationReader(IStorageHandlerFactory storageHandlerFactory)
         {
-            _fileReader = fileReader;
+            _storageHandler = storageHandlerFactory.Get(StorageType.Aggregations);
         }
 
-        public async Task<IEnumerable<CategoryAggregation>> ReadAsync(string path)
+        public async Task<IEnumerable<CategoryAggregation>> ReadAsync(string relativePath)
         {
-            var data = await _fileReader.ReadAsync(path);
+            var data = await _storageHandler.ReadAllTextAsync(relativePath);
 
             return JsonConvert.DeserializeObject<IEnumerable<CategoryAggregation>>(data) ??
-                throw new InvalidDataException($"Category aggregations could not be loaded from file {path}.");
+                throw new InvalidDataException($"Category aggregations could not be loaded from file {relativePath}.");
         }
     }
 }

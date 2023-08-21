@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Abstractions.Categorization
+﻿namespace Finamoid.Categorization
 {
     /// <summary>
     /// A Mutation with one or more categories assigned to it.
