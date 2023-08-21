@@ -26,7 +26,8 @@ namespace Finamoid.Storage
             };
 
 
-            // TODO: These could be registered by the libraries that use them. It could be name-based rather than enum based, so we don't bleed unnecessary details.
+            // TODO https://github.com/TheAsteroid/finamoid/issues/11: These could be registered by the libraries that use them.
+            // It could be name-based rather than enum based, so we don't bleed unnecessary details.
             _storageHandlers = new ReadOnlyDictionary<StorageType, Lazy<IStorageHandler>>(
                 new Dictionary<StorageType, Lazy<IStorageHandler>>
                 {
