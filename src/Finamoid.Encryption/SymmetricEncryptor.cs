@@ -1,5 +1,4 @@
-﻿using Finamoid.Encryption;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace Finamoid.Encryption
 {

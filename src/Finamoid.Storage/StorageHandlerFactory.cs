@@ -1,5 +1,4 @@
 ﻿using Finamoid.Encryption;
-using Finamoid.Storage;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
 
@@ -21,9 +20,9 @@ namespace Finamoid.Storage
 
             IStorageHandler getStorageHandler(bool encrypted, string relativeDirectory)
             {
-                return encrypted ? 
-                    new ProtectedStorageHandler(Path.Combine(rootDirectory, relativeDirectory), encryptor, keyProvider) : 
-                    new StorageHandler(rootDirectory);
+                return encrypted ?
+                    new ProtectedStorageHandler(Path.Combine(rootDirectory, relativeDirectory), encryptor, keyProvider) :
+                    new StorageHandler(Path.Combine(rootDirectory, relativeDirectory));
             };
 
 

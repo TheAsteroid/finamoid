@@ -2,6 +2,6 @@
 {
     public interface ICategoryWriter
     {
-        Task WriteAsync(string relativePath, IEnumerable<Category> categories);
+        Task WriteAsync(IEnumerable<Category> categories);
     }
 }

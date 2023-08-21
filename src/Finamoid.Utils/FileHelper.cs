@@ -1,5 +1,4 @@
-﻿using Finamoid;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace Finamoid.Utils
 {
@@ -10,7 +9,7 @@ namespace Finamoid.Utils
 
         public static string GetFileNameDatePart(DateTime dateTime, PeriodType periodType) => periodType switch
         {
-            PeriodType.Week => Path.Combine(dateTime.Year.ToString(), $"{_weekPrefix}{ISOWeek.GetWeekOfYear(dateTime):00}"),
+            PeriodType.Week => Path.Combine(ISOWeek.GetYear(dateTime).ToString(), $"{_weekPrefix}{ISOWeek.GetWeekOfYear(dateTime):00}"),
             PeriodType.Month => Path.Combine(dateTime.Year.ToString(), $"{_monthPrefix}{dateTime.Month:00}"),
             PeriodType.Year => dateTime.Year.ToString(),
             _ => throw new InvalidOperationException($"{nameof(PeriodType)} must be defined.")

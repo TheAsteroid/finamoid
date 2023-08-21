@@ -24,7 +24,9 @@
                 RootDirectory;
 
             // Return the relative path (strip the root directory)
-            return Directory.EnumerateFiles(directory, searchPattern, searchOption).Select(f => f.Substring(RootDirectory.Length));
+            return Directory
+                .EnumerateFiles(directory, searchPattern, searchOption)
+                .Select(f => f[RootDirectory.Length..].TrimStart(Path.DirectorySeparatorChar));
         }
 
         public bool FileExists(string relativePath)

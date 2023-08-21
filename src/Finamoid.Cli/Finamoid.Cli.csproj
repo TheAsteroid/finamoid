@@ -13,8 +13,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Finamoid.Abstractions\Finamoid.Abstractions.csproj" />
+    <ProjectReference Include="..\Finamoid.Aggregation\Finamoid.Aggregation.csproj" />
+    <ProjectReference Include="..\Finamoid.Categorization\Finamoid.Categorization.csproj" />
     <ProjectReference Include="..\Finamoid.Encryption\Finamoid.Encryption.csproj" />
     <ProjectReference Include="..\Finamoid.Import\Finamoid.Import.csproj" />
+    <ProjectReference Include="..\Finamoid.Mutations\Finamoid.Mutations.csproj" />
     <ProjectReference Include="..\Finamoid.Storage\Finamoid.Storage.csproj" />
   </ItemGroup>
 

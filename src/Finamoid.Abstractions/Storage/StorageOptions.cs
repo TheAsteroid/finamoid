@@ -12,7 +12,7 @@
 
         public PeriodType PeriodType { get; init; } = PeriodType.Month;
 
-        public string? RootDirectory { get; init; } = 
+        public string? RootDirectory { get; init; } =
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create),
                 "Finamoid");

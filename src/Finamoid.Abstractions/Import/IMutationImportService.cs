@@ -2,6 +2,6 @@
 {
     public interface IMutationImportService
     {
-        Task<int> ImportAsync(string relativePath);
+        Task<int> ImportAndStoreAsync(string fullPath);
     }
 }

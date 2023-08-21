@@ -1,4 +1,4 @@
-﻿namespace Finamoid.Categorization
+﻿namespace Finamoid.Categorization.CategorizedMutations
 {
     public interface ICategorizedMutationReader
     {

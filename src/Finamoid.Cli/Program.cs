@@ -1,25 +1,24 @@
-﻿using Finamoid.Cli;
+﻿using Finamoid.Aggregation;
+using Finamoid.Categorization;
+using Finamoid.Cli;
+using Finamoid.Encryption;
+using Finamoid.Import;
+using Finamoid.Mutations;
+using Finamoid.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Finamoid.Import;
-using Microsoft.Extensions.Configuration;
-using Finamoid.Storage;
-using Finamoid.Encryption;
 
 var builder = Host.CreateApplicationBuilder();
 
-//builder.Configuration
-//    .AddJsonFile("appsettings.json", optional: true)
-//    .AddEnvironmentVariables()
-//    .Build();
-
 builder.Services
     .AddHostedService<CliService>()
-    .AddMutationImport()
+    .AddAggregation()
+    .AddCategorization()
     .AddEncryption()
-    .AddStorage()
-    .Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+    .AddImport()
+    .AddMutations()
+    .AddStorage(builder.Configuration);
 
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
