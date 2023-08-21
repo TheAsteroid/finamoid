@@ -2,6 +2,6 @@
 {
     public interface IMutationCategorizerService
     {
-        Task CategorizeAndStoreAsync(DateTime? startDate, DateTime? endDate);
+        Task CategorizeAndStoreAsync(DateTime? startDate, DateTime? endDate, bool ignoreDuplicateCategories);
     }
 }

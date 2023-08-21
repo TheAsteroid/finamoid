@@ -4,7 +4,7 @@ namespace Finamoid.Categorization
 {
     public class MutationCategorizer : IMutationCategorizer
     {
-        public IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations)
+        public IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations, bool ignoreDuplicateCategories)
         {
             var result = new List<CategorizedMutation>();
 
@@ -37,6 +37,11 @@ namespace Finamoid.Categorization
                     {
                         balanceType == BalanceType.In ? inWildcardCategory : outWildcardCategory
                     };
+                }
+
+                if (ignoreDuplicateCategories)
+                {
+                    mutationCategories = mutationCategories.Take(1);
                 }
 
                 result.Add(new CategorizedMutation(mutationCategories.Select(c => c.Code), mutation));

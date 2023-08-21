@@ -6,6 +6,6 @@ namespace Finamoid.Categorization
     {
         CategorizedMutation AssignMutationToCategory(CategorizedMutation categorizedMutation, Category category);
 
-        IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations);
+        IEnumerable<CategorizedMutation> Categorize(IEnumerable<Category> categories, IEnumerable<Mutation> mutations, bool ignoreDuplicateCategories);
     }
 }

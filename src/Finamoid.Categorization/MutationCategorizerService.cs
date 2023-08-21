@@ -22,13 +22,14 @@ namespace Finamoid.Categorization
             _mutationCategorizer = mutationCategorizer;
             _categorizedMutationWriter = categorizedMutationWriter;
         }
-        public async Task CategorizeAndStoreAsync(DateTime? startDate, DateTime? endDate)
+
+        public async Task CategorizeAndStoreAsync(DateTime? startDate, DateTime? endDate, bool ignoreDuplicateCategories)
         {
             var categories = await _categoryReader.ReadLatestAsync();
 
             var mutations = await _mutationReader.ReadAsync(startDate, endDate);
 
-            var categorizedMutations = _mutationCategorizer.Categorize(categories, mutations);
+            var categorizedMutations = _mutationCategorizer.Categorize(categories, mutations, ignoreDuplicateCategories);
 
             await _categorizedMutationWriter.WriteAsync(categorizedMutations);
         }

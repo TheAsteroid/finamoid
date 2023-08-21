@@ -29,6 +29,8 @@ namespace Finamoid.Cli
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            AnsiConsole.MarkupLine("[blue]Welcome to Finamoid![/]");
+
             while (true)
             {
                 stoppingToken.ThrowIfCancellationRequested();
@@ -72,23 +74,23 @@ namespace Finamoid.Cli
 
                 if (fileCount > 0)
                 {
-                    AnsiConsole.WriteLine($"Great news! {fileCount} file(s) were imported in {stopwatch.ElapsedMilliseconds}ms.");
+                    AnsiConsole.MarkupLine($"[green]Great news! {fileCount} file(s) were imported in {stopwatch.ElapsedMilliseconds}ms.[/]");
 
                     return true;
                 }
 
-                AnsiConsole.WriteLine("No files were found in this location.");
+                AnsiConsole.MarkupLine("[orange]No files were found in this location.[/]");
             }
             catch (Exception ex)
             when (ex is NotSupportedException || ex is IOException || ex is InvalidOperationException)
             {
-                AnsiConsole.WriteLine("Something went wrong when importing the mutations. Details:");
+                AnsiConsole.MarkupLine("[red]Something went wrong when importing the mutations. Details:[/]");
                 AnsiConsole.WriteLine(ex.ToString());
             }
             catch (Exception ex)
             when (ex is NotImplementedException)
             {
-                AnsiConsole.WriteLine("Oops, this part of the code is not done yet. Details:");
+                AnsiConsole.MarkupLine("[orange]Oops, this part of the code is not done yet. Details:[/]");
                 AnsiConsole.WriteLine(ex.ToString());
             }
 
@@ -105,14 +107,14 @@ namespace Finamoid.Cli
                 await _categoryImportService.ImportAndStoreAsync(path);
                 stopwatch.Stop();
 
-                AnsiConsole.WriteLine($"Great news! The categories were imported in {stopwatch.ElapsedMilliseconds}ms.");
+                AnsiConsole.MarkupLine($"[green]Great news! The categories were imported in {stopwatch.ElapsedMilliseconds}ms.[/]");
 
                 return true;
             }
             catch (Exception ex)
             when (ex is IOException || ex is InvalidDataException || ex is InvalidOperationException)
             {
-                AnsiConsole.WriteLine("Something went wrong when importing the categories. Details:");
+                AnsiConsole.MarkupLine("[green]Something went wrong when importing the categories. Details:[/]");
                 AnsiConsole.WriteLine(ex.ToString());
             }
 
@@ -124,30 +126,32 @@ namespace Finamoid.Cli
             DateTime? startDate = null;
             DateTime? endDate = null;
 
-            if (AnsiConsole.Confirm("Do you want to start categorizing at a certain date? Select no if you want to start categorizing from the beginning of the history."))
+            if (AnsiConsole.Confirm("Do you want categorize from a certain date? Select no if you want to categorize from the beginning of the history."))
             {
-                startDate = AnsiConsole.Ask<DateTime?>("Please provide the start date in yyyy-mm-dd format:");
+                startDate = GetUTCDate(AnsiConsole.Ask<DateTime?>("Please provide the start date in yyyy-mm-dd format:"));
             }
 
-            if (AnsiConsole.Confirm("Do you want to stop categorizing at a certain date? Select no if you want to categorize until the last available date."))
+            if (AnsiConsole.Confirm("Do you want to categorize until a certain date? Select no if you want to categorize until the last available date."))
             {
-                endDate = AnsiConsole.Ask<DateTime?>("Please provide the end date in yyyy-mm-dd format:");
+                endDate = GetUTCDate(AnsiConsole.Ask<DateTime?>("Please provide the end date in yyyy-mm-dd format:"));
             }
+
+            var ignoreDuplicateCategory = AnsiConsole.Confirm("Do you want to ignore duplicate categories? In this case the first match will be chosen. This allows for aggregating without review.");
 
             try
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                await _mutationCategorizerService.CategorizeAndStoreAsync(startDate, endDate);
+                await _mutationCategorizerService.CategorizeAndStoreAsync(startDate, endDate, ignoreDuplicateCategory);
                 stopwatch.Stop();
 
-                AnsiConsole.WriteLine($"Great news! The categorization was done in {stopwatch.ElapsedMilliseconds}ms.");
+                AnsiConsole.MarkupLine($"[green]Great news! The categorization was done in {stopwatch.ElapsedMilliseconds}ms.[/]");
 
                 return true;
             }
             catch (Exception ex)
             when (ex is IOException || ex is InvalidDataException || ex is InvalidOperationException)
             {
-                AnsiConsole.WriteLine("Something went wrong while categorizing. Details:");
+                AnsiConsole.MarkupLine("[orange]Something went wrong while categorizing. Details:[/]");
                 AnsiConsole.WriteLine(ex.ToString());
             }
 
@@ -159,14 +163,14 @@ namespace Finamoid.Cli
             DateTime? startDate = null;
             DateTime? endDate = null;
 
-            if (AnsiConsole.Confirm("Do you want to start aggregating at a certain date? Select no if you want to start aggregating from the beginning of the history."))
+            if (AnsiConsole.Confirm("Do you want aggregate from a certain date? Select no if you want to aggregate from the beginning of the history."))
             {
-                startDate = AnsiConsole.Ask<DateTime?>("Please provide the start date in yyyy-mm-dd format:");
+                startDate = GetUTCDate(AnsiConsole.Ask<DateTime?>("Please provide the start date in yyyy-mm-dd format:"));
             }
 
-            if (AnsiConsole.Confirm("Do you want to stop aggregating at a certain date? Select no if you want to aggregate until the last available date."))
+            if (AnsiConsole.Confirm("Do you want to aggregate until a certain date? Select no if you want to aggregate until the last available date."))
             {
-                endDate = AnsiConsole.Ask<DateTime?>("Please provide the end date in yyyy-mm-dd format:");
+                endDate = GetUTCDate(AnsiConsole.Ask<DateTime?>("Please provide the end date in yyyy-mm-dd format:"));
             }
 
             var writeTonew = AnsiConsole.Confirm("Do you want to update the latest existing aggregation? Select no to create a new aggregation.");
@@ -181,14 +185,14 @@ namespace Finamoid.Cli
                 await _mutationAggregatorService.AggregateAndStoreAsync(startDate, endDate, periodType, writeTonew);
                 stopwatch.Stop();
 
-                AnsiConsole.WriteLine($"Great news! The categorization was done in {stopwatch.ElapsedMilliseconds}ms.");
+                AnsiConsole.MarkupLine($"[green]Great news! The aggregation was done in {stopwatch.ElapsedMilliseconds}ms.[/]");
 
                 return true;
             }
             catch (Exception ex)
             when (ex is IOException || ex is InvalidDataException || ex is InvalidOperationException)
             {
-                AnsiConsole.WriteLine("Something went wrong while categorizing. Details:");
+                AnsiConsole.MarkupLine("[red]Something went wrong while categorizing. Details:[/]");
                 AnsiConsole.WriteLine(ex.ToString());
             }
 
@@ -197,11 +201,16 @@ namespace Finamoid.Cli
 
         private Task<bool> ExitAsync(CancellationToken stoppingToken)
         {
-            AnsiConsole.WriteLine("Goodbye...");
+            AnsiConsole.MarkupLine("[blue]Goodbye...[/]");
 
             Environment.Exit(0);
 
             return Task.FromResult(true);
+        }
+
+        private static DateTime? GetUTCDate(DateTime? dateTime)
+        {
+            return dateTime == null ? null : new DateTime(dateTime.Value.Year, dateTime.Value.Month, dateTime.Value.Day, 0, 0, 0, DateTimeKind.Utc);
         }
     }
 }
